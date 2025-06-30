@@ -1,5 +1,6 @@
 "use client";
 
+import { bulkDeleteTransactions } from '@/actions/accounts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox'
@@ -9,10 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { categoryColors } from '@/data/categories';
+import useFetch from '@/hooks/use-fetch';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronUp, Clock, MoreHorizontal, RefreshCcw, RefreshCw, Search, Trash, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { BarLoader } from 'react-spinners';
+import { toast } from 'sonner';
 
 const RECURRING_INTERVALS = {
     DAILY: "Daily",
@@ -32,6 +36,8 @@ const TransactionTable = ({transactions}) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [recurringFilter, setRecurringFilter] = useState("");
+
+    const {loading: deleteLoading, fn: deleteFn, data: deleted} = useFetch(bulkDeleteTransactions);
 
     const filteredAndSortedTransactions = useMemo(() => {
         let result = [...transactions];
@@ -99,7 +105,25 @@ const TransactionTable = ({transactions}) => {
     );
 };
 
-    const handleBulkDelete = () => {}
+    const handleBulkDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} transactions?`
+      )
+    )
+      return;
+
+    else{
+        deleteFn(selectedIds);
+        setSelectedIds([]);
+    }
+  };
+
+    useEffect(() => {
+        if(deleted && !deleteLoading){
+            toast.error("Transactions deleted successfully");
+        }
+    }, [deleted, deleteLoading]);
 
     const handleClearFilters = () => {
         setSearchTerm("");
@@ -118,6 +142,9 @@ const TransactionTable = ({transactions}) => {
 
   return (
     <div className='space-y-4'>
+      {deleteLoading && (
+        <BarLoader className='mt-4' width={"100%"} color='#9333ea'/>
+        )}
       {/* Filters */}
       <div className='flex flex-col sm:flex-row gap-4'>
         <div className='relative flex-1'>
@@ -164,18 +191,20 @@ const TransactionTable = ({transactions}) => {
         </div>
       </div>
 
+      {/* Chart Section */}
+
       {/* Transactions */}
       <div className='rounded-md border'>
         <Table>
             <TableHeader>
                 <TableRow>
-                <TableHead className="w-[50px]">
+                {/* <TableHead className="w-[50px]">
                     <Checkbox onCheckedChange = {handleSelectAll}
                     checked = {
                         selectedIds.length === filteredAndSortedTransactions.length && filteredAndSortedTransactions.length > 0
                     }
                     />
-                </TableHead>
+                </TableHead> */}
                 <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
                     <div className='flex items-center'>Date {sortConfig.field === 'date' && (
                         sortConfig.direction === 'asc' ? <ChevronUp className='ml-1 h-4 w-4' /> : <ChevronDown className='ml-1 h-4 w-4' />
@@ -206,7 +235,7 @@ const TransactionTable = ({transactions}) => {
                 ):(
                     filteredAndSortedTransactions.map((transaction) => (
                         <TableRow key={transaction.id}>
-                            <TableCell><Checkbox onCheckedChange = {() => handleSelect(transaction.id)} checked={selectedIds.includes(transaction.id)}/></TableCell>
+                            {/* <TableCell><Checkbox onCheckedChange = {() => handleSelect(transaction.id)} checked={selectedIds.includes(transaction.id)}/></TableCell> */}
                             <TableCell>{format(new Date(transaction.date), "PP")}</TableCell>
                             <TableCell>{transaction.description}</TableCell>
                             <TableCell className="capitalize">
@@ -253,14 +282,14 @@ const TransactionTable = ({transactions}) => {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="cursor-pointer">
-                                        <DropdownMenuLabel
+                                        <DropdownMenuItem
                                         onClick={() => {
                                             router.push(`/transaction/create?edit=${transaction.id}`)
                                         }}>
-                                            Edit</DropdownMenuLabel>
+                                            Edit</DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem className="text-destructive cursor-pointer" 
-                                        // onClick={() => deleteFn([transaction.id])}
+                                        onClick={() => deleteFn([transaction.id])}
                                         >
                                             Delete
                                         </DropdownMenuItem>
