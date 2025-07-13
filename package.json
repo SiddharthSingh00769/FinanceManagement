@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "email": "email dev",
+    "prebuild": "prisma generate",    
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "post install": "prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.9",
