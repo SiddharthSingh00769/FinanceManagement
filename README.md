@@ -1,118 +1,151 @@
-✨ FinAura - Personal Finance Management
-<p align="center">
-<img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js"/>
-<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"/>
-<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase"/>
-<img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma"/>
-<img src="https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk"/>
-<img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-<img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"/>
-</p>
+<div align="center">
+
+# ✨ FinAura — Personal Finance Management
+
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io)
+[![Clerk](https://img.shields.io/badge/Clerk-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Inngest](https://img.shields.io/badge/Inngest-161616?style=for-the-badge)](https://www.inngest.com)
+[![Resend](https://img.shields.io/badge/Resend-000?style=for-the-badge)](https://resend.com)
+
+_A modern full‑stack app that makes personal finance fast, secure, and delightful._
+
+</div>
 
 <p align="center">
-A full-stack personal finance application designed to provide a secure, fast, and intuitive user experience for managing your financial health.
+  <img width="900" alt="FinAura screenshot" src="https://github.com/user-attachments/assets/2046cc4c-81ea-4473-8fe2-0d8c408bd8c0">
 </p>
 
-<p align="center">
-<a href="#-introduction"><strong>Introduction</strong></a> •
-<a href="#-key-features"><strong>Key Features</strong></a> •
-<a href="#-tech-stack"><strong>Tech Stack</strong></a> •
-<a href="#-security-model"><strong>Security</strong></a> •
-<a href="#-getting-started"><strong>Getting Started</strong></a>
-</p>
+## 🚀 Introduction
 
-<p align="center">
-<img width="1901" height="916" alt="Screenshot 2025-08-15 000101" src="https://github.com/user-attachments/assets/2046cc4c-81ea-4473-8fe2-0d8c408bd8c0" />
-</p>
+FinAura helps you track accounts, budgets, and transactions with zero‑trust data access and optional AI‑powered receipt scanning. It’s built with the **App Router** (Next.js 14), **Clerk** for auth, **Postgres** via **Prisma**, and production niceties like **Inngest** background jobs and **Resend** emails.
 
+## ✨ Key Features
 
-🚀 Introduction
-FinAura was born from the idea that managing your finances should feel empowering, not overwhelming. It’s a modern web application designed to be incredibly fast, secure, and genuinely easy to use. It provides a comprehensive dashboard for a bird's-eye view of your accounts and budgets, detailed transaction tracking, and intelligent features like an AI-powered receipt scanner to eliminate tedious data entry.
+- **Comprehensive Dashboard** – Quick glances at balances, budgets, and spend.
+- **Accounts & Budgets** – Create multiple accounts and monthly/categorical budgets.
+- **Transactions** – Log merchant, category, amount, and date.
+- **🤖 AI Receipt Scanner** – Upload an image; Vision OCR (or fallback) extracts key fields.
+- **Asynchronous Email Alerts** – Welcome emails via Inngest + Resend.
+- **Secure Authentication** – Clerk-powered sessions & MFA.
+- **Responsive UI** – Tailwind + modern cards & components.
 
-✨ Key Features
-Comprehensive Dashboard: A single-pane view of your financial health, including account balances, budget progress, and spending overviews.
+## 🛠 Tech Stack
 
-Account & Budget Management: Easily create and manage multiple financial accounts and set monthly or categorical budgets.
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **Auth**: Clerk
+- **Database**: Postgres / Supabase
+- **ORM**: Prisma
+- **Jobs**: Inngest
+- **Email**: React Email & Resend
+- **AI / OCR**: Google Cloud Vision (stub included)
+- **Storage**: Vercel Blob (stub included)
 
-Detailed Transaction Tracking: Log all your transactions with details like category, merchant, and date.
+## 🔐 Security Model
 
-🤖 AI Receipt Scanner: Simply upload a photo of a receipt, and our AI assistant (powered by Google Vision AI) will automatically extract the merchant, date, and total amount to pre-fill the form.
+- **Authentication (Clerk)**: Manages identity, sessions, and MFA.
+- **Authorization (RLS)**: If deploying on Supabase, enable **Row Level Security** (see `supabase/policies.sql`) so every query is authorized at the DB layer via your JWT claims.
+- **Handshake**: Clerk issues a JWT; Supabase verifies and enforces RLS using the embedded `sub` (user id).
 
-Asynchronous Email Alerts: Receive timely notifications (e.g., a welcome email upon sign-up) without ever blocking the user interface, powered by a robust background job runner.
+> ℹ️ This starter ships with a Prisma schema and a separate `supabase/policies.sql` guide you can adapt if you host on Supabase.
 
-Secure Authentication: User authentication is handled by Clerk, providing enterprise-grade security features like multi-factor authentication (MFA).
+## 🧪 Getting Started
 
-Responsive Design: A beautiful and consistent user experience across desktop, tablet, and mobile devices.
+### 1) Prerequisites
 
-🛠️ Tech Stack
-FinAura is built with a modern, integrated tech stack chosen for performance, security, and developer experience.
+- Node.js 18+
+- Postgres (local or Supabase)
+- Clerk account (publishable + secret keys)
+- Resend (optional but recommended for emails)
 
-Framework: 🚀 Next.js (with App Router)
+### 2) Clone & Install
 
-Styling: 🎨 Tailwind CSS
-
-Authentication: 🔐 Clerk
-
-Database: 🐘 Supabase (PostgreSQL) with Row-Level Security
-
-ORM: prisma Prisma
-
-Asynchronous Jobs: 🕒 Inngest
-
-Email: ✉️ React Email & Resend
-
-AI / OCR: 🧠 Google Cloud Vision AI
-
-File Storage: ☁️ Vercel Blob
-
-🔐 Security Model
-Security is the highest priority in FinAura. Our model is built on a robust, multi-layered approach to ensure user data is always protected.
-
-Authentication (Clerk): Manages who users are. Clerk handles secure sign-up, sign-in, session management, and provides easy integration for Multi-Factor Authentication (MFA).
-
-Authorization (Supabase RLS): Manages what users can see. We use Supabase's powerful Row-Level Security (RLS) on every table. This means every single data request is verified at the database level, ensuring it's impossible for a user to access another user's data.
-
-The Handshake: Clerk generates a secure JWT for each user session. Supabase verifies this token on every request and uses the embedded user_id to enforce the RLS policies. This creates a zero-trust environment where every action is authenticated and authorized.
-
-🚀 Getting Started
-To get a local copy up and running, follow these simple steps.
-
-Prerequisites
-Node.js (v18 or later)
-
-npm / yarn / pnpm
-
-A Supabase account for the database
-
-A Clerk account for authentication
-
-Installation
-Clone the repo
-
+```bash
 git clone https://github.com/your-username/finaura.git
-
-Install NPM packages
-
+cd finaura
 npm install
+```
 
-Set up environment variables
-Create a .env.local file in the root of your project and add your keys from Supabase and Clerk.
+### 3) Configure Environment
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+Copy `.env.example` → `.env.local` and fill values:
 
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_CLERK_PUBLISHABLE_KEY
-CLERK_SECRET_KEY=YOUR_CLERK_SECRET_KEY
+```bash
+cp .env.example .env.local
+```
 
-Push the database schema
-Use Prisma to migrate your database schema to your Supabase instance.
+- `DATABASE_URL` – local Postgres or Supabase pooled URL
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`
+- `RESEND_API_KEY` / `EMAIL_FROM`
+- (Optional) `GOOGLE_APPLICATION_CREDENTIALS_JSON` for Vision
+- (Optional) `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- (Optional) `BLOB_READ_WRITE_TOKEN`
 
-npx prisma db push
+### 4) Database
 
-Run the development server
+Push schema:
 
+```bash
+npm run db:push
+```
+
+Open Prisma Studio (optional):
+
+```bash
+npm run db:studio
+```
+
+### 5) Run the Dev Server
+
+```bash
 npm run dev
+```
 
-Open http://localhost:3000 with your browser to see the result.
+Open **http://localhost:3000**
+
+### 6) Inngest (optional)
+
+```bash
+npm run inngest:dev
+# In a separate terminal, run `npm run dev` as usual
+```
+
+## 📦 Project Structure
+
+```
+finaura/
+├─ prisma/
+│  └─ schema.prisma
+├─ src/
+│  ├─ app/            # Next.js App Router
+│  │  ├─ api/
+│  │  │  ├─ receipt/route.ts     # AI receipt parse (Vision or stub)
+│  │  │  └─ inngest/route.ts     # Inngest handler
+│  │  ├─ sign-in/[[...sign-in]]/page.tsx
+│  │  ├─ sign-up/[[...sign-up]]/page.tsx
+│  │  ├─ layout.tsx
+│  │  └─ page.tsx
+│  ├─ components/     # UI components
+│  ├─ emails/         # React Email templates
+│  ├─ inngest/        # Background functions
+│  ├─ lib/            # Prisma & Supabase helpers
+│  └─ utils/vision.ts # Vision OCR + fallback parser
+├─ supabase/          # RLS policy examples
+└─ ...
+```
+
+## 🧰 Notes & Customization
+
+- **OCR**: The Vision integration reads `GOOGLE_APPLICATION_CREDENTIALS_JSON`. If not provided, a simple heuristic parser runs (stub). Replace with your own OCR/LLM logic for production.
+- **RLS**: When deploying on Supabase, enable RLS per table and attach policies based on Clerk JWT claims.
+- **Emails**: Update `EMAIL_FROM` with your verified sender in Resend.
+- **Storage**: Swap the receipt upload with Vercel Blob if desired.
+
+## 📝 License
+
+MIT © Your Name
