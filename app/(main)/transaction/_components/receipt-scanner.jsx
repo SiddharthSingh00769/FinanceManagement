@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShimmerButton } from "@/components/animations/shimmer-button";
 import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 import { scanReceipt } from "@/actions/transaction";
@@ -45,10 +46,8 @@ export function ReceiptScanner({ onScanComplete }) {
           if (file) handleReceiptScan(file);
         }}
       />
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-10 bg-gradient-to-br from-orange-500 via-pink-500 to-purple-500 animate-gradient hover:opacity-90 transition-opacity text-white hover:text-white"
+      <ShimmerButton
+        className="w-full"
         onClick={() => fileInputRef.current?.click()}
         disabled={scanReceiptLoading}
       >
@@ -63,7 +62,7 @@ export function ReceiptScanner({ onScanComplete }) {
             <span>Scan Receipt with AI</span>
           </>
         )}
-      </Button>
+      </ShimmerButton>
     </div>
   );
 }

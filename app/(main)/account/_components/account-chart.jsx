@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { endOfDay, format, startOfDay, subDays } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, Rectangle, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { formatCurrency } from '@/lib/currency'
 
 const DATE_RANGES = {
     "7D": {label: "Last 7 days", days: 7},
@@ -79,15 +80,15 @@ const AccountChart = ({transactions}) => {
             <div className='flex justify-around mb-6 text-sm'>
                 <div className='text-center'>
                     <p className='text-muted-foreground'>Total Income</p>
-                    <p className='text-lg font-bold text-green-500'>${totals.income.toFixed(2)}</p>
+                    <p className='text-lg font-bold text-green-500'>{formatCurrency(totals.income)}</p>
                 </div>
                 <div className='text-center'>
                     <p className='text-muted-foreground'>Total Expenses</p>
-                    <p className='text-lg font-bold text-red-500'>${totals.expense.toFixed(2)}</p>
+                    <p className='text-lg font-bold text-red-500'>{formatCurrency(totals.expense)}</p>
                 </div>
                 <div className='text-center'>
                     <p className='text-muted-foreground'>Net</p>
-                    <p className={`text-lg font-bold ${totals.income - totals.expense >= 0 ? "text-green-500" : "text-red-500"}`}>${(totals.income - totals.expense).toFixed(2)}</p>
+                    <p className={`text-lg font-bold ${totals.income - totals.expense >= 0 ? "text-green-500" : "text-red-500"}`}>{formatCurrency(totals.income - totals.expense)}</p>
                 </div>
             </div>
             <div className='h-[300px]'>
@@ -107,10 +108,10 @@ const AccountChart = ({transactions}) => {
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(value) => `$${value}`}
+                        tickFormatter={(value) => formatCurrency(value)}
                     />
                     <Tooltip
-                        formatter={(value) => [`$${value}`, undefined]}
+                        formatter={(value) => [formatCurrency(value), undefined]}
                         contentStyle={{
                         backgroundColor: "hsl(var(--popover))",
                         border: "1px solid hsl(var(--border))",

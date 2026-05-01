@@ -147,7 +147,71 @@
   }
 }
 
+.animate-gradient-title {
+  @apply text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-purple-600;
+}
+
+.glass-card {
+  @apply bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl relative overflow-hidden;
+}
+
+.neon-glow-purple {
+  @apply shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:shadow-[0_0_30px_rgba(168,85,247,0.15)];
+}
+
+.neon-glow-blue {
+  @apply shadow-[0_0_20px_rgba(59,130,246,0.2)] dark:shadow-[0_0_30px_rgba(59,130,246,0.15)];
+}
+
+.neon-glow-orange {
+  @apply shadow-[0_0_20px_rgba(249,115,22,0.2)] dark:shadow-[0_0_30px_rgba(249,115,22,0.15)];
+}
+
+.mesh-gradient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: hsla(0, 0%, 100%, 1);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+  filter: blur(100px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.dark .mesh-gradient-bg {
+  background-color: hsla(240, 10%, 3%, 1);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(263, 40%, 20%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 20%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 20%, 1) 0, transparent 50%);
+  opacity: 0.4;
+}
+
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradientMove 3s ease infinite;
+}
+
+@keyframes meteor {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(215deg) translateX(-1000px);
+    opacity: 0;
+  }
+}
+
+.animate-meteor-effect {
+  animation: meteor 5s linear infinite;
 }

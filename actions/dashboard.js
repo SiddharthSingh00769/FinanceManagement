@@ -108,8 +108,7 @@ export async function getUserAccounts() {
         }
     });
 
-    const serializedAccount = accounts.map(serializeTransaction);
-    return serializedAccount;
+    return accounts.map(serializeTransaction);
 }
 
 export async function getDashboardData() {

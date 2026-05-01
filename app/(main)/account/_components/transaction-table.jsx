@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useOptimistic, useTransition } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -12,6 +12,8 @@ import {
   ChevronRight,
   RefreshCw,
   Clock,
+  FileDown,
+  FileText,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -49,11 +51,14 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { formatSignedCurrency } from "@/lib/currency";
+import { exportToCSV, exportToPDF } from "@/lib/export";
 import { categoryColors } from "@/data/categories";
 import { bulkDeleteTransactions } from "@/actions/accounts";
-import useFetch from "@/hooks/use-fetch";
+
 import { BarLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -75,10 +80,37 @@ export function TransactionTable({ transactions }) {
   const [recurringFilter, setRecurringFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  // Initialize typeFilter from URL if present
+  useEffect(() => {
+    const type = searchParams.get("type");
+    if (type) setTypeFilter(type);
+  }, [searchParams]);
+
+  const handleTypeChange = (value) => {
+    setTypeFilter(value);
+    setCurrentPage(1);
+    
+    // Update URL
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set("type", value);
+    else params.delete("type");
+    
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  // Optimistic state: immediately remove deleted transactions from UI
+  const [optimisticTransactions, setOptimisticTransactions] = useOptimistic(
+    transactions,
+    (currentTransactions, deletedIds) =>
+      currentTransactions.filter((t) => !deletedIds.includes(t.id))
+  );
 
   // Memoized filtered and sorted transactions
   const filteredAndSortedTransactions = useMemo(() => {
-    let result = [...transactions];
+    let result = [...optimisticTransactions];
 
     // Apply search filter
     if (searchTerm) {
@@ -123,7 +155,7 @@ export function TransactionTable({ transactions }) {
     });
 
     return result;
-  }, [transactions, searchTerm, typeFilter, recurringFilter, sortConfig]);
+  }, [optimisticTransactions, searchTerm, typeFilter, recurringFilter, sortConfig]);
 
   // Pagination calculations
   const totalPages = Math.ceil(
@@ -161,12 +193,6 @@ export function TransactionTable({ transactions }) {
     );
   };
 
-  const {
-    loading: deleteLoading,
-    fn: deleteFn,
-    data: deleted,
-  } = useFetch(bulkDeleteTransactions);
-
   const handleBulkDelete = async () => {
     if (
       !window.confirm(
@@ -175,14 +201,37 @@ export function TransactionTable({ transactions }) {
     )
       return;
 
-    deleteFn(selectedIds);
+    const idsToDelete = [...selectedIds];
+    setSelectedIds([]);
+
+    // Optimistically remove from UI
+    startTransition(() => {
+      setOptimisticTransactions(idsToDelete);
+    });
+
+    const result = await bulkDeleteTransactions(idsToDelete);
+    if (result?.success) {
+      toast.success("Transactions deleted successfully");
+    } else {
+      toast.error(result?.error || "Failed to delete transactions");
+    }
+    router.refresh();
   };
 
-  useEffect(() => {
-    if (deleted && !deleteLoading) {
-      toast.error("Transactions deleted successfully");
+  const handleSingleDelete = async (transactionId) => {
+    // Optimistically remove from UI
+    startTransition(() => {
+      setOptimisticTransactions([transactionId]);
+    });
+
+    const result = await bulkDeleteTransactions([transactionId]);
+    if (result?.success) {
+      toast.success("Transaction deleted successfully");
+    } else {
+      toast.error(result?.error || "Failed to delete transaction");
     }
-  }, [deleted, deleteLoading]);
+    router.refresh();
+  };
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -196,9 +245,29 @@ export function TransactionTable({ transactions }) {
     setSelectedIds([]); // Clear selections on page change
   };
 
+  // Export handlers
+  const handleExportCSV = (exportAll = false) => {
+    const data = exportAll ? transactions : filteredAndSortedTransactions;
+    if (data.length === 0) {
+      toast.error("No transactions to export");
+      return;
+    }
+    exportToCSV(data, "Account");
+    toast.success(`Exported ${data.length} transactions as CSV`);
+  };
+
+  const handleExportPDF = (exportAll = false) => {
+    const data = exportAll ? transactions : filteredAndSortedTransactions;
+    if (data.length === 0) {
+      toast.error("No transactions to export");
+      return;
+    }
+    exportToPDF(data, "Account");
+  };
+
   return (
     <div className="space-y-4">
-      {deleteLoading && (
+      {isPending && (
         <BarLoader className="mt-4" width={"100%"} color="#9333ea" />
       )}
       {/* Filters */}
@@ -218,10 +287,7 @@ export function TransactionTable({ transactions }) {
         <div className="flex gap-2">
           <Select
             value={typeFilter}
-            onValueChange={(value) => {
-              setTypeFilter(value);
-              setCurrentPage(1);
-            }}
+            onValueChange={handleTypeChange}
           >
             <SelectTrigger className="w-[130px]">
               <SelectValue placeholder="All Types" />
@@ -247,6 +313,35 @@ export function TransactionTable({ transactions }) {
               <SelectItem value="non-recurring">Non-recurring Only</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Export Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <FileDown className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExportCSV(false)}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Export Current View (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportCSV(true)}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Export All (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleExportPDF(false)}>
+                <FileText className="h-4 w-4 mr-2" />
+                Print / Save as PDF (Current)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportPDF(true)}>
+                <FileText className="h-4 w-4 mr-2" />
+                Print / Save as PDF (All)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Bulk Actions */}
           {selectedIds.length > 0 && (
@@ -337,19 +432,36 @@ export function TransactionTable({ transactions }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedTransactions.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center text-muted-foreground"
+            <AnimatePresence initial={false} mode="popLayout">
+              {paginatedTransactions.length === 0 ? (
+                <motion.tr
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                 >
-                  No transactions found
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginatedTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  {/* <TableCell>
+                  <TableCell
+                    colSpan={7}
+                    className="text-center text-muted-foreground py-8"
+                  >
+                    No transactions found
+                  </TableCell>
+                </motion.tr>
+              ) : (
+                paginatedTransactions.map((transaction) => (
+                  <motion.tr 
+                    key={transaction.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0, clipPath: "inset(0% 0 0% 0)" }}
+                    exit={{ 
+                      opacity: 0, 
+                      y: 30,
+                      clipPath: "inset(100% 0 0% 0)", 
+                      transition: { duration: 0.4, ease: "backIn" } 
+                    }}
+                    className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors relative"
+                  >
+                    {/* <TableCell>
                     <Checkbox
                       checked={selectedIds.includes(transaction.id)}
                       onCheckedChange={() => handleSelect(transaction.id)}
@@ -377,8 +489,7 @@ export function TransactionTable({ transactions }) {
                         : "text-green-500"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}$
-                    {transaction.amount.toFixed(2)}
+                    {formatSignedCurrency(transaction.amount, transaction.type)}
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (
@@ -437,16 +548,17 @@ export function TransactionTable({ transactions }) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => deleteFn([transaction.id])}
+                          onClick={() => handleSingleDelete(transaction.id)}
                         >
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+                    </TableCell>
+                  </motion.tr>
+                ))
+              )}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </div>
