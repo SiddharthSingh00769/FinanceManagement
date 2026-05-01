@@ -5,6 +5,12 @@ import {
   CreditCard,
   Globe,
   Zap,
+  Mic,
+  Activity,
+  Play,
+  Stars,
+  Sparkles,
+  Scan,
 } from "lucide-react";
 
 // Stats Data
@@ -30,36 +36,40 @@ export const statsData = [
 // Features Data
 export const featuresData = [
   {
-    icon: <BarChart3 className="h-8 w-8 text-blue-600" />,
-    title: "Advanced Analytics",
+    icon: <Mic className="h-8 w-8 text-blue-600" />,
+    title: "Agentic AI Assistant (Aura)",
     description:
-      "Get detailed insights into your spending patterns with AI-powered analytics",
+      "Interact with Aura, your sentient financial partner. Use voice or text to log transactions and get real-time guidance.",
   },
   {
-    icon: <Receipt className="h-8 w-8 text-blue-600" />,
+    icon: <Activity className="h-8 w-8 text-blue-600" />,
+    title: "3D Spending Strand",
+    description:
+      "Visualize your financial flow in a stunning interactive 3D space. Track every dollar as it moves through your digital life.",
+  },
+  {
+    icon: <Play className="h-8 w-8 text-blue-600" />,
+    title: "Cinematic Monthly Replay",
+    description:
+      "Experience your month like a movie. A cinematic recap of your wins, spends, and saves with celebratory feedback.",
+  },
+  {
+    icon: <Stars className="h-8 w-8 text-blue-600" />,
+    title: "The Galaxy of Success",
+    description:
+      "Watch your dashboard transform into a dynamic star map. Every milestone connects to form constellations of your wealth.",
+  },
+  {
+    icon: <Sparkles className="h-8 w-8 text-blue-600" />,
+    title: "Aura's Daily Wisdom",
+    description:
+      "Start every day with a Tarot-style financial mantra. AI-driven insights that help you build mindful spending habits.",
+  },
+  {
+    icon: <Scan className="h-8 w-8 text-blue-600" />,
     title: "Smart Receipt Scanner",
     description:
-      "Extract data automatically from receipts using advanced AI technology",
-  },
-  {
-    icon: <PieChart className="h-8 w-8 text-blue-600" />,
-    title: "Budget Planning",
-    description: "Create and manage budgets with intelligent recommendations",
-  },
-  {
-    icon: <CreditCard className="h-8 w-8 text-blue-600" />,
-    title: "Multi-Account Support",
-    description: "Manage multiple accounts and credit cards in one place",
-  },
-  {
-    icon: <Globe className="h-8 w-8 text-blue-600" />,
-    title: "Multi-Currency",
-    description: "Support for multiple currencies with real-time conversion",
-  },
-  {
-    icon: <Zap className="h-8 w-8 text-blue-600" />,
-    title: "Automated Insights",
-    description: "Get automated financial insights and recommendations",
+      "Instantly extract data from any receipt using Gemini-powered OCR technology. No more manual entry.",
   },
 ];
 
