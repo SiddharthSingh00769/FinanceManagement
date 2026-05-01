@@ -7,9 +7,11 @@ import { formatCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { createPortal } from "react-dom";
 import { Confetti } from "@/components/animations/confetti";
 
 export function MonthlyReplay({ transactions, onClose, timeRange }) {
+  const [mounted, setMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [runningBalance, setRunningBalance] = useState(0);
@@ -18,6 +20,11 @@ export function MonthlyReplay({ transactions, onClose, timeRange }) {
   const [vibe, setVibe] = useState("neutral"); // neutral, positive, negative
   const [showSummary, setShowSummary] = useState(false);
   const [totals, setTotals] = useState({ income: 0, expense: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const timeRangeLabel = useMemo(() => {
     switch (timeRange) {
@@ -97,7 +104,9 @@ export function MonthlyReplay({ transactions, onClose, timeRange }) {
 
   const netSavings = totals.income - totals.expense;
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ 
@@ -107,7 +116,7 @@ export function MonthlyReplay({ transactions, onClose, timeRange }) {
       }}
       transition={{ backgroundColor: { duration: 0.5 } }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 backdrop-blur-3xl overflow-hidden"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-10 backdrop-blur-3xl overflow-hidden"
     >
       {showSummary && netSavings > 0 && <Confetti />}
 
@@ -120,7 +129,7 @@ export function MonthlyReplay({ transactions, onClose, timeRange }) {
       <Button 
         variant="ghost" 
         size="icon" 
-        className="absolute top-6 right-6 text-white/50 hover:text-white z-[110]"
+        className="absolute top-6 right-6 text-white/50 hover:text-white z-[1010]"
         onClick={onClose}
       >
         <X className="h-6 w-6" />
@@ -337,6 +346,7 @@ export function MonthlyReplay({ transactions, onClose, timeRange }) {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 }
