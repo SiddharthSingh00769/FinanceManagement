@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
         </head>
         <body className={`${inter.className}`}>
           {/* header */}
-          <Header/>
+          <Header />
 
           <main className="min-h-screen">
             {children}
@@ -51,7 +51,7 @@ export default function RootLayout({ children }) {
           {/* footer */}
           <footer className="bg-blue-50 dark:bg-blue-950/30 py-12">
             <div className="container mx-auto px-4 text-center text-muted-foreground">
-              <p>Made with ❤️ by Sid</p>
+              <p>Made with ❤️ by Team</p>
             </div>
           </footer>
 
